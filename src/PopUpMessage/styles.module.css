@@ -1,0 +1,24 @@
+.popup {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 400px;
+    height: 100px;
+    opacity: 0;
+    transform: translateY(-300px);
+    transition: opacity 0.3s ease, transform 0.5s ease;
+    color: white;
+    background-color: #332D56;
+    border-radius: 10px;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    white-space: pre-line;
+}
+
+.visible {
+    opacity: 1;
+    transform: translateY(0);
+}

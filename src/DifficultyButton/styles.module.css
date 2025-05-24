@@ -1,0 +1,67 @@
+.difficultyBtnContainer {
+    position: relative;
+}
+
+.btn {
+    font-family: inherit;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1.7rem;
+    background-color: #73946B;
+    border: none;
+}
+
+.btn:hover {
+    opacity: 0.7;
+}
+
+.option {
+    width: 100%;
+    margin-top: 10px;
+    height: 25%;
+}
+
+.option:hover {
+    opacity: 0.7;
+}
+
+.popup {
+    opacity: 0;
+    transform: translateY(10px);
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background-color: #4B352A;
+    top: -200px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    align-items: center;
+    justify-content: start;
+    transition: opacity 0.5s ease, transform 0.3s ease;
+    clip-path: polygon(0% 0%, 100% 0%, 100% 92%, 68% 92%, 44% 100%, 30% 91%, 0 91%);
+    z-index: 10;
+}
+
+.visible {
+    visibility: visible;
+    opacity: 1;
+    z-index: 300;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + label {
+    transition: background-color 0.2s ease-in;
+    background-color: #B2CD9C;
+}
+
+label {
+    display: inline-block;
+    width: 100%;
+    color: white;
+}
+
