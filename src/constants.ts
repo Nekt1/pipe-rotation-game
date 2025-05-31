@@ -1,29 +1,4 @@
-export type DifficultyValues = "easy" | "normal" | "hard"
-
-export type Direction = "top" | "bottom" | "left" | "right";
-
-export type Difficulties = {
-    [key in DifficultyValues]: {timer: number, gridSize: number}
-}
-
-export type Point = {
-    x: number,
-    y: number
-}
-
-export type PipeType = "elbow" | "straight" | "start" | "end";
-
-export type RotatableTypes = Extract<PipeType, "elbow" | "straight">
-
-export type RotationAngle = 0 | 90 | 180 | 270;
-
-type PipeConnectionRules = {
-    [angle in RotationAngle]?: Direction[]
-}
-
-type ConnectionRules = {
-    [type in PipeType]: PipeConnectionRules
-}
+import type { PipeType, Difficulties, Direction, ConnectionRules } from "./types"
 
 export class Pipe {
     rotation: number;
@@ -47,6 +22,8 @@ export const DIFFICULTIES: Difficulties = {
     normal: { timer: 60, gridSize: 7 },
     hard: { timer: 30, gridSize: 9 }
 } 
+
+export const DRAW_ROTATION_SPEED = 10;
 export const BORDER_SIZE = 100;
 export const CANVAS_SIZE = 950;
 export const SQUARE_SIZE = (CANVAS_SIZE - BORDER_SIZE) / GRID_SIZE;

@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from './styles/styles.module.css'
 import clsx from 'clsx';
-import EndGameMessage from './EndGameMessage/EndGameMessage.tsx';
-import PopUpMessage from './PopUpMessage/PopUpMessage.tsx';
-import DifficultyButton from './DifficultyButton/DifficultyButton.tsx';
-import { DIFFICULTIES, CANVAS_SIZE, BORDER_SIZE, type DifficultyValues, Pipe } from './constants.ts';
-import { ElbowDrawable, StraightDrawable, type Drawable, drawGrid } from './DrawHelpers/drawHelpers.ts'
-import { convertPathToPipes, fillTheWholeGrid, generateRandomEndPoints, generateRandomGrid } from './RandomGridGenerator/randomGridGenerator.ts';
-import { validateGrid } from './GridValidator/gridValidator.ts';
+import EndGameMessage from './Components/EndGameMessage/EndGameMessage.tsx';
+import PopUpMessage from './Components/PopUpMessage/PopUpMessage.tsx';
+import DifficultyButton from './Components/DifficultyButton/DifficultyButton.tsx';
+import type { DifficultyValues } from './types.ts';
+import { DIFFICULTIES, CANVAS_SIZE, BORDER_SIZE, DRAW_ROTATION_SPEED, Pipe } from './constants.ts';
+import { ElbowDrawable, StraightDrawable, type Drawable, drawGrid, cleanTheGrid } from './utils/drawHelpers.ts'
+import { convertPathToPipes, fillTheWholeGrid, generateRandomEndPoints, generateRandomGrid } from './utils/randomGridGenerator.ts';
+import { validateGrid } from './utils/gridValidator.ts';
+import Timer from './Components/Timer/Timer.tsx';
 
 function populateDrawables(pipes: Pipe[][], SQUARE_SIZE: number) {
     drawables.length = 0;
@@ -50,6 +52,12 @@ function initializePipes(startPipe: Pipe, endPipe: Pipe, gridSize: number) {
     return filledGrid
 }
 
+function getUpdatedTimeLimit(updatedGridSize: number) {
+    for (const options of Object.values(DIFFICULTIES)) {
+        if (options.gridSize === updatedGridSize) return options.timer
+    }
+}
+
 const drawables: Drawable[] = []
 
 function App() {
@@ -67,27 +75,10 @@ function App() {
 
     const SQUARE_SIZE = (CANVAS_SIZE - BORDER_SIZE) / difficulty.gridSize;
 
-    useEffect(() => {
-		timerRef.current = setInterval(() => {
-			setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
-		}, 1000);
-
-		if (timeLeft === 0 && timerRef.current) {
-            setGameOver('You Lost')
-			clearInterval(timerRef.current);
-		}
-
-		return () => {
-			if (timerRef.current) clearInterval(timerRef.current);
-		};
-	}, [timeLeft]);
-
-
-    function rotatePipe(pipeData: Pipe) {
-        if (!pipeData) return;
-        const { rotation, id, type, x, y } = pipeData;
+    function rotatePipe(pipeToRotate: Pipe) {
+        const { rotation, id, type, x, y } = pipeToRotate;
         setPipeData(prevData => prevData.map(row => row.map(pipe => {
-            return pipe.id === pipeData.id ? new Pipe(rotation + 90, id, type, x, y) : pipe
+            return pipe.id === pipeToRotate.id ? new Pipe(rotation + 90, id, type, x, y) : pipe
         })))
     }
 
@@ -95,66 +86,50 @@ function App() {
         if (pipeData) populateDrawables(pipeData, SQUARE_SIZE)
     }, [])
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    function handleFrame() {
+        const ctx = ctxRef.current;
+
+        if (!ctx || !pipeData || !pipeData) return;
+        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+        for (const drawable of drawables) {
+            const pipeState = pipeData.flat().find(pipe => pipe.id === drawable.pipeData.id)
+            ctx.save()
+            ctx.translate(SQUARE_SIZE / 2, SQUARE_SIZE / 2);
+            if (pipeState && drawable.drawAngle < pipeState.rotation) {
+                drawable.drawAngle += DRAW_ROTATION_SPEED;
+            }
+            drawable.draw(ctx, SQUARE_SIZE)
+            ctx.restore()
+        }
+
+        drawGrid(pipeData, ctx, pipeEndPoints.startPipe, pipeEndPoints.endPipe, difficulty.gridSize, SQUARE_SIZE)
+        animationRef.current = requestAnimationFrame(handleFrame)
+    }
+
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        canvas.height = CANVAS_SIZE;
-        canvas.width = CANVAS_SIZE;
-
         if (!ctxRef.current) ctxRef.current = canvas.getContext('2d')
-        const ctx = ctxRef.current;
 
-        function handleFrame() {
-            if (!ctx) return;
-
-            ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-            for (const drawable of drawables) {
-                if (!pipeData) return;
-                const pipeState = pipeData.flat().find(pipe => pipe.id === drawable.pipeData.id)
-                ctx.save()
-                ctx.translate(SQUARE_SIZE / 2, SQUARE_SIZE / 2);
-                if (pipeState && drawable.drawAngle < pipeState.rotation) {
-                    drawable.drawAngle += 10;
-                }
-                drawable.draw(ctx, SQUARE_SIZE)
-                ctx.restore()
-            }
-            drawGrid(pipeData, ctx, pipeEndPoints.startPipe, pipeEndPoints.endPipe, difficulty.gridSize, SQUARE_SIZE)
-            animationRef.current = requestAnimationFrame(handleFrame)
-        }
-        
-        requestAnimationFrame(handleFrame)
-
+        animationRef.current = requestAnimationFrame(handleFrame);
         return () => {
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
-        };
-    }, [pipeData])
-
-
-    function cleanTheGrid() {
-        const ctx = ctxRef.current;
-        if (ctx) ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-    }
-
-    function getRequiredTime(updatedGridSize: number) {
-        for (const options of Object.values(DIFFICULTIES)) {
-            if (options.gridSize === updatedGridSize) return options.timer
         }
-    }
+    }, [pipeData])
 
     function restartGame(newDifficulty: number, newSquareSize: number) {
         const newEndPoints = generateRandomEndPoints(newDifficulty)
         setPipeEndPoints(newEndPoints)
         const newGrid = initializePipes(newEndPoints.startPipe, newEndPoints.endPipe, newDifficulty)
-        if (newGrid) {
+        if (newGrid && ctxRef.current) {
             setGameOver(null)
             setPipeData(newGrid)
-            cleanTheGrid()
+            cleanTheGrid(ctxRef.current)
             populateDrawables(newGrid, newSquareSize)
         }
-        const updatedTimer = getRequiredTime(newDifficulty)
+        const updatedTimer = getUpdatedTimeLimit(newDifficulty)
         if (updatedTimer) setTimeLeft(updatedTimer)
         setPopUp('Game restarted')
     }
@@ -168,7 +143,6 @@ function App() {
 
         const row = Math.floor(clickY / SQUARE_SIZE);
         const col = Math.floor(clickX / SQUARE_SIZE);
-
         if ((row >= 0 && row < pipeData.length) && (col >= 0 && col < pipeData[0].length)) {
             rotatePipe(pipeData[row][col])
         }
@@ -205,7 +179,7 @@ function App() {
                 <PopUpMessage message={popUpMessage} isToggled={isPopUpToggled}/>
                 <div className={styles.canvasContainer}>
                     {gameOver && <EndGameMessage message={gameOver}/>}
-                    <canvas ref={canvasRef} onClick={handleClick} className={clsx({
+                    <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} onClick={handleClick} className={clsx({
                         [styles.gameOver]: gameOver
                     })}/>
                 </div>
@@ -217,10 +191,10 @@ function App() {
                         <button className={styles.btn} type="button" onClick={() => restartGame(difficulty.gridSize, SQUARE_SIZE)}>restart game</button>
                     </div>
                     <div className={styles.item}>
-                        <div className={styles.timer}>{timeLeft}</div>
+                        <DifficultyButton handleOptionChange={handleOptionChange} difficulty={difficulty.gridSize}/>
                     </div>
                     <div className={styles.item}>
-                        <DifficultyButton handleOptionChange={handleOptionChange} difficulty={difficulty.gridSize}/>
+                        <Timer timeLeft={timeLeft} setTimeLeft={setTimeLeft} gameOver={gameOver} setGameOver={setGameOver}/>
                     </div>
                 </div>
             </div>

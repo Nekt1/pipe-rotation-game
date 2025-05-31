@@ -1,5 +1,5 @@
-import { BORDER_SIZE, CANVAS_SIZE } from "../constants.ts";
-import type { Direction, Pipe } from "../constants.ts"
+import { BORDER_SIZE, CANVAS_SIZE, Pipe } from "../constants.ts";
+import type { Direction } from "../types.ts"
 
 interface Drawable {
     x: number;
@@ -67,6 +67,10 @@ class StraightDrawable implements Drawable {
         ctx.fillStyle = '#808080';
         ctx.fill()
     }
+}
+
+export function cleanTheGrid(ctx: CanvasRenderingContext2D) {
+    if (ctx) ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 }
 
 function drawCrucialPipes(pipe: Pipe, ctx: CanvasRenderingContext2D, difficulty: number, pipeData: Pipe[][], SQUARE_SIZE: number) {

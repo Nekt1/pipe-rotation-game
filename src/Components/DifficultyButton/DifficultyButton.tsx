@@ -1,5 +1,5 @@
-import type { DifficultyValues } from '../constants';
-import styles from './styles.module.css'
+import type { DifficultyValues } from '../../types.ts';
+import styles from './styles.module.scss'
 import { useState } from 'react'
 
 interface DifficultyButtonProps {

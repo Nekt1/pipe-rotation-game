@@ -1,4 +1,5 @@
-import type { Pipe, Direction, RotationAngle } from "../constants.ts"
+import type { Direction, RotationAngle } from "../types.ts"
+import { Pipe } from "../constants.ts"
 import { DIRECTIONS, CONNECTION_RULES, OPPOSITE_DIRECTIONS } from '../constants.ts'
 
 function listPipeConnections(pipe: Pipe): Direction[] {
