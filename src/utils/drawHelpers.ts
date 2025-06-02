@@ -7,6 +7,7 @@ interface Drawable {
     drawAngle: number;
     size: number;
     pipeData: Pipe;
+    fillStyle: string;
     draw(ctx: CanvasRenderingContext2D, SQUARE_SIZE: number): void;
 }
 
@@ -17,6 +18,7 @@ class ElbowDrawable implements Drawable {
     size: number;
     width: number;
     pipeData: Pipe;
+    fillStyle = '#0B3954';
 
     constructor(x: number, y: number, pipeData: Pipe, SQUARE_SIZE: number) {
         this.x = x;
@@ -34,7 +36,7 @@ class ElbowDrawable implements Drawable {
         ctx.rotate(this.drawAngle * Math.PI / 180)
         ctx.rect(-this.width / 2, - this.width / 2, SQUARE_SIZE / 2 + this.width / 2, this.width)
         ctx.rect(-this.width / 2, -SQUARE_SIZE / 2, this.width, SQUARE_SIZE / 2)
-        ctx.fillStyle = '#808080';
+        ctx.fillStyle = this.fillStyle;
         ctx.fill();
     }
 }
@@ -47,6 +49,7 @@ class StraightDrawable implements Drawable {
     width: number; // square size / 4
     pipeData: Pipe;
     id: number;
+    fillStyle = '#0B3954';
 
     constructor(x: number, y: number, pipeData: Pipe, SQUARE_SIZE: number) {
         this.x = x;
@@ -64,7 +67,7 @@ class StraightDrawable implements Drawable {
         ctx.translate(this.x + (BORDER_SIZE / 2), this.y + (BORDER_SIZE / 2));
         ctx.rotate(this.drawAngle * Math.PI / 180)
         ctx.rect(-this.width / 2, -SQUARE_SIZE / 2, this.width, SQUARE_SIZE)
-        ctx.fillStyle = '#808080';
+        ctx.fillStyle = this.fillStyle;
         ctx.fill()
     }
 }
@@ -112,19 +115,15 @@ function drawCrucialPipes(pipe: Pipe, ctx: CanvasRenderingContext2D, difficulty:
     ctx.save()
     ctx.translate(BORDER_SIZE / 2, BORDER_SIZE / 2)
     ctx.beginPath()
-    ctx.fillStyle = 'yellow'
+    ctx.fillStyle = '#E6E6EA'
     ctx.fillRect(startDrawX, startDrawY, START_SQUARE_SIZE, START_SQUARE_SIZE);
-    ctx.fillStyle = 'red'
-    ctx.font = '18px Rajdhani'
-    ctx.fillText(pipe.type, startDrawX + START_SQUARE_SIZE / 4, startDrawY + START_SQUARE_SIZE / 2)
-    ctx.stroke();
     ctx.restore()
 }
 
 function drawGrid(pipeData: Pipe[][], ctx: CanvasRenderingContext2D, startPipe: Pipe, endPipe: Pipe, difficulty: number, SQUARE_SIZE: number) {
     ctx.save()
     ctx.lineWidth = 100;
-    ctx.strokeStyle = '#CA7842'
+    ctx.strokeStyle = '#B20D30'
     ctx.strokeRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
     ctx.restore()
     drawCrucialPipes(startPipe, ctx, difficulty, pipeData, SQUARE_SIZE)

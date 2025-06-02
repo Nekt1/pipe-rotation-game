@@ -1,5 +1,6 @@
 import type { DifficultyValues } from '../../types.ts';
 import styles from './styles.module.scss'
+import commonStyles from '../../styles.module.scss'
 import { useState } from 'react'
 
 interface DifficultyButtonProps {
@@ -24,7 +25,7 @@ export default function DifficultyButton(props: DifficultyButtonProps) {
 
     return (
         <div className={styles.difficultyBtnContainer}>
-            <button className={`${styles.btn} ${styles.btnRed}`} type="button" onClick={toggleDifficultySelector}>difficulty</button>
+            <button className={`${commonStyles.btn}`} type="button" onClick={toggleDifficultySelector}>difficulty</button>
             <div className={`${styles.popup} ${isToggleVisible ? styles.visible : ''}`}>
                 <div className={styles.option}>
                     <input type="radio" name="difficulty" id="easy" onChange={handleChange} value={'easy'} checked={difficulty === 5} />

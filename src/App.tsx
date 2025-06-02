@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import styles from './styles/styles.module.css'
+import styles from './styles.module.scss'
 import clsx from 'clsx';
 import EndGameMessage from './Components/EndGameMessage/EndGameMessage.tsx';
 import PopUpMessage from './Components/PopUpMessage/PopUpMessage.tsx';
@@ -70,7 +70,6 @@ function App() {
     const [popUpMessage, setPopUpMessage] = useState('')
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
-    const timerRef = useRef<number | null>(null)
     const animationRef = useRef<number | null>(null)
 
     const SQUARE_SIZE = (CANVAS_SIZE - BORDER_SIZE) / difficulty.gridSize;
@@ -89,7 +88,7 @@ function App() {
     function handleFrame() {
         const ctx = ctxRef.current;
 
-        if (!ctx || !pipeData || !pipeData) return;
+        if (!ctx || !pipeData) return;
         ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
         for (const drawable of drawables) {
@@ -156,12 +155,8 @@ function App() {
 
     function checkValidity(pipeData: Pipe[][]) {
         const result = validateGrid(pipeData, pipeEndPoints.startPipe, pipeEndPoints.endPipe)
-        if (!result) setPopUp('Grid is not valid, try again!')
-
-        if (result) {
-            setGameOver('YOU WON')
-            if (timerRef.current) clearInterval(timerRef.current);
-        }
+        if (result) setGameOver('YOU WON')
+        else setPopUp('Grid is not valid, try again!')
     }
 
     function handleOptionChange(updatedDifficulty: DifficultyValues) {
@@ -175,7 +170,7 @@ function App() {
 
     return (
         <>
-            <div className="container">
+            <div className={styles.container}>
                 <PopUpMessage message={popUpMessage} isToggled={isPopUpToggled}/>
                 <div className={styles.canvasContainer}>
                     {gameOver && <EndGameMessage message={gameOver}/>}

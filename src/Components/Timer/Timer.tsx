@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import styles from './styles.module.scss'
+import clsx from "clsx";
 
 export default function Timer(props) {
     const { timeLeft, setTimeLeft, setGameOver, gameOver } = props;
@@ -23,6 +24,9 @@ export default function Timer(props) {
     }, [timeLeft]);
 
     return (
-        <div className={styles.timer}>{timeLeft}</div>
+        <div className={clsx(styles.timer, {
+            [styles.warning]: (timeLeft < 10 && timeLeft > 0)
+        }
+        )}>{timeLeft}</div>
     )
 }
