@@ -1,9 +1,10 @@
-import styles from './styles.module.css'
+import clsx from 'clsx'
+import styles from './styles.module.scss'
 
-export default function EndGameMessage(props) {
+export default function EndGameMessage({message}: {message: string}) {
     return (
-        <div className={styles.endGameMessage}>
-            <p>{props.message}</p>
+        <div className={clsx(styles.endGameMessage)}>
+            <p>{message}</p>
         </div>
     )
 }

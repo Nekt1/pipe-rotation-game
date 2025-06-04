@@ -6,29 +6,10 @@ import PopUpMessage from './Components/PopUpMessage/PopUpMessage.tsx';
 import DifficultyButton from './Components/DifficultyButton/DifficultyButton.tsx';
 import type { DifficultyValues } from './types.ts';
 import { DIFFICULTIES, CANVAS_SIZE, BORDER_SIZE, DRAW_ROTATION_SPEED, Pipe } from './constants.ts';
-import { ElbowDrawable, StraightDrawable, type Drawable, drawGrid, cleanTheGrid } from './utils/drawHelpers.ts'
+import { Drawable, drawGrid, cleanTheGrid, populateDrawables } from './utils/drawHelpers.ts'
 import { convertPathToPipes, fillTheWholeGrid, generateRandomEndPoints, generateRandomGrid } from './utils/randomGridGenerator.ts';
 import { validateGrid } from './utils/gridValidator.ts';
 import Timer from './Components/Timer/Timer.tsx';
-
-function populateDrawables(pipes: Pipe[][], SQUARE_SIZE: number) {
-    drawables.length = 0;
-    for (let row = 0; row < pipes.length; row++) {
-        for (let col = 0; col < pipes[row].length; col++) {
-            const pipe = pipes[row][col];
-            const x = pipe.x * SQUARE_SIZE;
-            const y = pipe.y * SQUARE_SIZE;
-            switch (pipe.type) {
-                case 'straight':
-                    drawables.push(new StraightDrawable(x, y, pipe, SQUARE_SIZE))
-                    break;
-                case 'elbow':
-                    drawables.push(new ElbowDrawable(x, y, pipe, SQUARE_SIZE))
-                    break;
-            }
-        }
-    }
-}
 
 function initializePipes(startPipe: Pipe, endPipe: Pipe, gridSize: number) {
     const randomizedPath = generateRandomGrid(startPipe, endPipe, gridSize)
@@ -82,7 +63,7 @@ function App() {
     }
 
     useEffect(() => {
-        if (pipeData) populateDrawables(pipeData, SQUARE_SIZE)
+        if (pipeData) populateDrawables(pipeData, SQUARE_SIZE, drawables)
     }, [])
 
     function handleFrame() {
@@ -126,7 +107,7 @@ function App() {
             setGameOver(null)
             setPipeData(newGrid)
             cleanTheGrid(ctxRef.current)
-            populateDrawables(newGrid, newSquareSize)
+            populateDrawables(newGrid, newSquareSize, drawables)
         }
         const updatedTimer = getUpdatedTimeLimit(newDifficulty)
         if (updatedTimer) setTimeLeft(updatedTimer)
@@ -165,30 +146,30 @@ function App() {
         setDifficulty(newDifficulty)
         setTimeLeft(newDifficulty.timer)
         restartGame(newDifficulty.gridSize, updatedSquareSize)
-        setPopUp(`Grid size changed to: ${newDifficulty.gridSize}x${newDifficulty.gridSize}\n Good luck!`)
+        setPopUp(`Grid size changed to: ${newDifficulty.gridSize}x${newDifficulty.gridSize}`)
     }
 
     return (
         <>
-            <div className={styles.container}>
+            <div className={clsx(styles.container)}>
                 <PopUpMessage message={popUpMessage} isToggled={isPopUpToggled}/>
-                <div className={styles.canvasContainer}>
+                <div className={clsx(styles.canvasContainer)}>
                     {gameOver && <EndGameMessage message={gameOver}/>}
                     <canvas ref={canvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} onClick={handleClick} className={clsx({
                         [styles.gameOver]: gameOver
                     })}/>
                 </div>
-                <div className={styles.sidePanel}>
-                    <div className={styles.item}>
-                        <button className={styles.btn} type="button" onClick={() => (pipeData ? checkValidity(pipeData) : console.error('No pipe data'))}>validate grid</button>
+                <div className={clsx(styles.sidePanel)}>
+                    <div className={clsx(styles.item)}>
+                        <button className={clsx(styles.btn)} type="button" onClick={() => (pipeData ? checkValidity(pipeData) : console.error('No pipe data'))}>validate grid</button>
                     </div>
-                    <div className={styles.item}>
-                        <button className={styles.btn} type="button" onClick={() => restartGame(difficulty.gridSize, SQUARE_SIZE)}>restart game</button>
+                    <div className={clsx(styles.item)}>
+                        <button className={clsx(styles.btn)} type="button" onClick={() => restartGame(difficulty.gridSize, SQUARE_SIZE)}>restart game</button>
                     </div>
-                    <div className={styles.item}>
+                    <div className={clsx(styles.item)}>
                         <DifficultyButton handleOptionChange={handleOptionChange} difficulty={difficulty.gridSize}/>
                     </div>
-                    <div className={styles.item}>
+                    <div className={clsx(styles.item)}>
                         <Timer timeLeft={timeLeft} setTimeLeft={setTimeLeft} gameOver={gameOver} setGameOver={setGameOver}/>
                     </div>
                 </div>

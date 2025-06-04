@@ -72,6 +72,25 @@ class StraightDrawable implements Drawable {
     }
 }
 
+export function populateDrawables(pipes: Pipe[][], SQUARE_SIZE: number, drawables: Drawable[]) {
+    drawables.length = 0;
+    for (let row = 0; row < pipes.length; row++) {
+        for (let col = 0; col < pipes[row].length; col++) {
+            const pipe = pipes[row][col];
+            const x = pipe.x * SQUARE_SIZE;
+            const y = pipe.y * SQUARE_SIZE;
+            switch (pipe.type) {
+                case 'straight':
+                    drawables.push(new StraightDrawable(x, y, pipe, SQUARE_SIZE))
+                    break;
+                case 'elbow':
+                    drawables.push(new ElbowDrawable(x, y, pipe, SQUARE_SIZE))
+                    break;
+            }
+        }
+    }
+}
+
 export function cleanTheGrid(ctx: CanvasRenderingContext2D) {
     if (ctx) ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 }

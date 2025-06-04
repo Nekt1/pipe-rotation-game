@@ -23,7 +23,7 @@ export const DIFFICULTIES: Difficulties = {
     hard: { timer: 30, gridSize: 9 }
 } 
 
-export const DRAW_ROTATION_SPEED = 5;
+export const DRAW_ROTATION_SPEED = 7.5;
 export const BORDER_SIZE = 100;
 export const CANVAS_SIZE = 950;
 export const SQUARE_SIZE = (CANVAS_SIZE - BORDER_SIZE) / GRID_SIZE;
