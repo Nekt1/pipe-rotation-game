@@ -2,7 +2,14 @@ import { useEffect, useRef } from "react";
 import styles from './styles.module.scss'
 import clsx from "clsx";
 
-export default function Timer(props) {
+interface TimerProps {
+    timeLeft: number,
+    setTimeLeft: React.Dispatch<React.SetStateAction<number>>,
+    setGameOver: React.Dispatch<React.SetStateAction<string | null>>,
+    gameOver: string | null
+}
+
+export default function Timer(props: TimerProps) {
     const { timeLeft, setTimeLeft, setGameOver, gameOver } = props;
     const timerRef = useRef<number | null>(null)
     if (gameOver && timerRef.current) clearInterval(timerRef.current)

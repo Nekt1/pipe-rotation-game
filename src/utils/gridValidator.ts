@@ -4,7 +4,7 @@ import { DIRECTIONS, CONNECTION_RULES, OPPOSITE_DIRECTIONS } from '../constants.
 
 function listPipeConnections(pipe: Pipe): Direction[] {
     const rotation = pipe.rotation % 360 as RotationAngle;
-    return CONNECTION_RULES[pipe.type][rotation] ?? CONNECTION_RULES[pipe.type][0];
+    return CONNECTION_RULES[pipe.type][rotation] ?? CONNECTION_RULES[pipe.type][0] ?? [];
 }
 
 function validateNeighbor(pipeArray: Pipe[][], row: number, col: number, direction: Direction) {
