@@ -1,4 +1,4 @@
-import type { Point, Direction, PipeType, RotatableTypes } from '../constants.ts'
+import type { Point, Direction, PipeType, RotatableTypes } from '../types.ts'
 import { DIRECTIONS, Pipe } from '../constants.ts'
 
 function generateRandomEndPointCoordinates(gridSize: number) {

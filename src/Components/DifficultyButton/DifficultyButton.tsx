@@ -20,7 +20,7 @@ export default function DifficultyButton(props: DifficultyButtonProps) {
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         const updatedDifficulty = e.target.value
-        if (updatedDifficulty) handleOptionChange(updatedDifficulty)
+        if (updatedDifficulty) handleOptionChange(updatedDifficulty as DifficultyValues)
         setIsToggleVisible(false)
     }
 

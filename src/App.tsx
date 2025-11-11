@@ -57,7 +57,7 @@ function App() {
 
     function rotatePipe(pipeToRotate: Pipe) {
         const { rotation, id, type, x, y } = pipeToRotate;
-        setPipeData(prevData => prevData.map(row => row.map(pipe => {
+        setPipeData(prevData => (prevData || []).map(row => row.map(pipe => {
             return pipe.id === pipeToRotate.id ? new Pipe(rotation + 90, id, type, x, y) : pipe
         })))
     }
@@ -114,7 +114,7 @@ function App() {
         setPopUp('Game restarted')
     }
 
-    function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
+    function handleClick(e: React.MouseEvent<HTMLCanvasElement>) {
         const rect = canvasRef.current?.getBoundingClientRect()
         if (!rect || !pipeData) return;
 
@@ -131,7 +131,7 @@ function App() {
     function setPopUp(message: string) {
         setPopUpMessage(message)
         setIsPopUpToggled(true)
-        setTimeout(() => setIsPopUpToggled(false), 1000)
+        setTimeout(() => setIsPopUpToggled(false), 2000)
     }
 
     function checkValidity(pipeData: Pipe[][]) {
